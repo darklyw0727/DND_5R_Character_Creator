@@ -1,6 +1,10 @@
 import { useCharacterStore, selectFinalAbilityScores } from '../../store/characterStore'
 import { CLASS_NAME_ZH, CLASS_COLOR } from '../../data/classConstants'
 import { ABILITY_LABELS, ABILITY_KEYS, getModifier, formatModifier, getProficiencyBonus } from '../../data/abilityScoreData'
+import { useClassData } from '../../hooks/useClassData'
+import { useRaceData } from '../../hooks/useRaceData'
+import { useBackgroundData } from '../../hooks/useBackgroundData'
+import { SIZE_LABEL } from '../../services/raceParser'
 
 const RANDOM_NAMES = [
   'Aelindra', 'Brom', 'Caelindrel', 'Dorin', 'Erevos', 'Faelar',
@@ -8,6 +12,24 @@ const RANDOM_NAMES = [
   'Malcon', 'Nessa', 'Orin', 'Praxis', 'Quillan', 'Riven',
   'Seraph', 'Theron', 'Ursa', 'Vex', 'Wren', 'Xander', 'Yelena', 'Zorn',
 ]
+
+const SKILL_ZH: Record<string, string> = {
+  acrobatics: '特技', 'animal handling': '馴獸', arcana: '奧秘',
+  athletics: '運動', deception: '欺瞞', history: '歷史',
+  insight: '看破', intimidation: '威嚇', investigation: '調查',
+  medicine: '醫療', nature: '自然', perception: '察覺',
+  performance: '表演', persuasion: '說服', religion: '宗教',
+  'sleight of hand': '手法', stealth: '隱匿', survival: '求生',
+}
+
+const ABILITY_ZH: Record<string, string> = {
+  str: '力量', dex: '敏捷', con: '體質', int: '智力', wis: '感知', cha: '魅力',
+}
+
+function skillLabel(raw: string): string {
+  const key = raw.toLowerCase()
+  return SKILL_ZH[key] ? `${raw}（${SKILL_ZH[key]}）` : raw
+}
 
 export default function Step7Naming() {
   const store = useCharacterStore()
@@ -19,6 +41,62 @@ export default function Step7Naming() {
   const finalScores = selectFinalAbilityScores(store)
   const totalLevel = classes.reduce((s, c) => s + c.level, 0)
   const profBonus = getProficiencyBonus(totalLevel)
+
+  const { data: classDataMap } = useClassData()
+  const { data: raceDataList } = useRaceData()
+  const { data: bgDataList } = useBackgroundData()
+
+  // Ability modifiers
+  const conMod = getModifier(finalScores.con)
+  const dexMod = getModifier(finalScores.dex)
+  const wisMod = getModifier(finalScores.wis)
+
+  // HP = Σ(each class: level*(hd/2+1+conMod)) + (primaryHD - 1)
+  let hp: number | null = null
+  if (classes.length > 0 && classDataMap.size > 0) {
+    const primaryHD = classDataMap.get(classes[0].className)?.summary.hd ?? 8
+    let total = Math.floor(primaryHD / 2) - 1
+    for (const cls of classes) {
+      const hd = classDataMap.get(cls.className)?.summary.hd ?? 8
+      total += cls.level * (Math.floor(hd / 2) + 1 + conMod)
+    }
+    hp = total
+  }
+
+  // AC (no armor: 10 + DEX)
+  const ac = 10 + dexMod
+
+  // Initiative = DEX modifier
+  const initiative = dexMod
+
+  // Hit Dice list
+  const hitDiceList = classes.map(cls => ({
+    count: cls.level,
+    die: classDataMap.get(cls.className)?.summary.hd ?? 8,
+    className: cls.className,
+  }))
+
+  // Race stats
+  const currentRace = raceDataList.find(r => r.name === raceName)
+  const walkSpeed = currentRace?.walkSpeed ?? 30
+  const flySpeed = currentRace?.flySpeed
+  const size = currentRace?.size ?? 'M'
+
+  // Passive Perception — proficiency from background or class skills (tracked for background only)
+  const bgData = bgDataList.find(b => b.name === backgroundName)
+  const bgSkills: string[] = bgData?.skillProficiencies ?? []
+  const hasPerceptionProf = bgSkills.some(s => s.toLowerCase().includes('perception'))
+  const passivePerception = 10 + wisMod + (hasPerceptionProf ? profBonus : 0)
+
+  // Saving throw proficiencies — from primary class only (multiclassing doesn't add saves)
+  const primarySaves: string[] = classes.length > 0
+    ? (classDataMap.get(classes[0].className)?.summary.rawClass.proficiency ?? [])
+    : []
+
+  // Class skill pool (primary class starting proficiencies)
+  const primarySkillEntry = classes.length > 0
+    ? classDataMap.get(classes[0].className)?.summary.rawClass.startingProficiencies.skills?.[0]
+    : undefined
 
   function randomName() {
     const name = RANDOM_NAMES[Math.floor(Math.random() * RANDOM_NAMES.length)]
@@ -151,10 +229,137 @@ export default function Step7Naming() {
               })}
             </div>
           </div>
+
+          {/* 戰鬥屬性 */}
+          <div className="card">
+            <h3 className="section-title">戰鬥屬性</h3>
+            <dl className="grid grid-cols-2 gap-x-4 gap-y-2 text-sm">
+
+              <dt className="text-gray-500">生命值（HP）</dt>
+              <dd className="text-green-400 font-bold text-base">
+                {hp !== null ? hp : '—'}
+              </dd>
+
+              <dt className="text-gray-500">護甲等級（AC）</dt>
+              <dd className="text-gray-100 font-semibold">
+                {ac}
+                <span className="text-xs text-gray-500 ml-1">（無護甲）</span>
+              </dd>
+
+              <dt className="text-gray-500">先攻</dt>
+              <dd className={`font-semibold ${initiative >= 0 ? 'text-green-400' : 'text-red-400'}`}>
+                {initiative >= 0 ? `+${initiative}` : `${initiative}`}
+              </dd>
+
+              <dt className="text-gray-500">速度</dt>
+              <dd className="text-gray-100">
+                步行 {walkSpeed} 呎
+                {flySpeed !== undefined && <span className="text-blue-400 ml-2">飛行 {flySpeed} 呎</span>}
+              </dd>
+
+              <dt className="text-gray-500">體型</dt>
+              <dd className="text-gray-100">{SIZE_LABEL[size] ?? size}</dd>
+
+              <dt className="text-gray-500">被動察覺</dt>
+              <dd className="text-gray-100 font-semibold">
+                {passivePerception}
+                {hasPerceptionProf && (
+                  <span className="text-xs text-dnd-gold ml-1">（含熟練）</span>
+                )}
+              </dd>
+
+            </dl>
+
+            {/* 生命骰 */}
+            {hitDiceList.length > 0 && (
+              <div className="mt-3 pt-3 border-t border-dnd-border">
+                <div className="text-xs text-gray-500 mb-1.5">生命骰</div>
+                <div className="flex flex-wrap gap-2">
+                  {hitDiceList.map((hd, i) => (
+                    <span key={i} className="tag text-sm font-mono">
+                      {hd.count}d{hd.die}
+                      <span className="text-xs opacity-60 ml-1">
+                        （{CLASS_NAME_ZH[hd.className] ?? hd.className}）
+                      </span>
+                    </span>
+                  ))}
+                </div>
+              </div>
+            )}
+          </div>
         </div>
 
-        {/* 右：法術與匯出 */}
+        {/* 右：熟練、法術與匯出 */}
         <div className="space-y-4">
+
+          {/* 熟練項目 */}
+          <div className="card">
+            <h3 className="section-title">熟練項目</h3>
+
+            {/* 豁免熟練 */}
+            <div className="mb-3">
+              <div className="text-xs text-gray-500 mb-1.5">豁免熟練</div>
+              {primarySaves.length > 0 ? (
+                <div className="flex flex-wrap gap-1.5">
+                  {primarySaves.map(save => (
+                    <span key={save} className="tag text-xs">
+                      {ABILITY_ZH[save] ?? save}（{save.toUpperCase()}）
+                    </span>
+                  ))}
+                </div>
+              ) : (
+                <span className="text-gray-500 text-xs">（未選擇職業）</span>
+              )}
+            </div>
+
+            {/* 技能熟練 */}
+            <div className="pt-3 border-t border-dnd-border">
+              <div className="text-xs text-gray-500 mb-1.5">技能熟練</div>
+
+              {/* 背景技能 */}
+              {bgSkills.length > 0 && (
+                <div className="mb-2">
+                  <div className="text-xs text-gray-600 mb-1">背景：</div>
+                  <div className="flex flex-wrap gap-1.5">
+                    {bgSkills.map(skill => (
+                      <span key={skill} className="tag text-xs">
+                        {skillLabel(skill)}
+                      </span>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {/* 職業技能池 */}
+              {primarySkillEntry && (
+                <div>
+                  <div className="text-xs text-gray-600 mb-1">
+                    職業（
+                    {classes[0] ? (CLASS_NAME_ZH[classes[0].className] ?? classes[0].className) : ''}
+                    ）：
+                  </div>
+                  {'choose' in primarySkillEntry ? (
+                    <div className="text-xs text-gray-400">
+                      <span className="text-dnd-gold">任選 {primarySkillEntry.choose.count} 項</span>
+                      {' 自：'}
+                      <span className="text-gray-300">
+                        {primarySkillEntry.choose.from.map(s => SKILL_ZH[s] ?? s).join('、')}
+                      </span>
+                    </div>
+                  ) : (
+                    <div className="text-xs text-dnd-gold">
+                      任選 {(primarySkillEntry as { any: number }).any} 項（任意技能）
+                    </div>
+                  )}
+                </div>
+              )}
+
+              {bgSkills.length === 0 && !primarySkillEntry && (
+                <span className="text-gray-500 text-xs">（未選擇背景或職業）</span>
+              )}
+            </div>
+          </div>
+
           {/* 法術列表 */}
           {spellSelections.length > 0 && (
             <div className="card">

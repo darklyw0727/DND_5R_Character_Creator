@@ -21,9 +21,9 @@ export function formatModifier(score: number): string {
   return mod >= 0 ? `+${mod}` : `${mod}`
 }
 
-// Proficiency Bonus
+// Proficiency Bonus: 1-4→+2, 5-8→+3, 9-12→+4, 13-16→+5, 17-20→+6
 export function getProficiencyBonus(totalLevel: number): number {
-  return Math.ceil(totalLevel / 4) + 1
+  return Math.floor((totalLevel - 1) / 4) + 2
 }
 
 // ─── 多職業法術槽位表（XPHB） ─────────────────────────────────
