@@ -1,0 +1,98 @@
+{
+  "_note": "此為範例資料。請從 5etools 中文版複製完整的 races.json",
+  "_source": "https://github.com/hazmole/TheGiddyLimit.github.io",
+  "race": [
+    {
+      "name": "人類",
+      "source": "PHB",
+      "speed": 30,
+      "ability": [
+        { "str": 1, "dex": 1, "con": 1, "int": 1, "wis": 1, "cha": 1 }
+      ],
+      "entries": ["人類是費倫最常見的種族，以其多樣性和野心著稱。"]
+    },
+    {
+      "name": "山地矮人",
+      "source": "PHB",
+      "speed": 25,
+      "ability": [
+        { "str": 2, "con": 2 }
+      ],
+      "entries": ["山地矮人強壯且耐寒，天生的工匠。"]
+    },
+    {
+      "name": "高等精靈",
+      "source": "PHB",
+      "speed": 30,
+      "ability": [
+        { "dex": 2, "int": 1 }
+      ],
+      "entries": ["高等精靈擁有千年的智慧與對魔法的天賦。"]
+    },
+    {
+      "name": "木精靈",
+      "source": "PHB",
+      "speed": 35,
+      "ability": [
+        { "dex": 2, "wis": 1 }
+      ],
+      "entries": ["木精靈與自然和諧共處，行動敏捷且感知敏銳。"]
+    },
+    {
+      "name": "輕足半身人",
+      "source": "PHB",
+      "speed": 25,
+      "ability": [
+        { "dex": 2, "cha": 1 }
+      ],
+      "entries": ["輕足半身人善於社交，能在大城市中自在穿梭。"]
+    },
+    {
+      "name": "龍裔",
+      "source": "PHB",
+      "speed": 30,
+      "ability": [
+        { "str": 2, "cha": 1 }
+      ],
+      "entries": ["龍裔體內流著龍族之血，散發著與生俱來的威嚴。"]
+    },
+    {
+      "name": "矮小侏儒",
+      "source": "PHB",
+      "speed": 25,
+      "ability": [
+        { "int": 2 },
+        { "choose": { "count": 1, "from": ["str","dex","con","wis","cha"], "amount": 1 } }
+      ],
+      "entries": ["矮小侏儒充滿好奇心，是天生的發明家和魔法師。"]
+    },
+    {
+      "name": "半精靈",
+      "source": "PHB",
+      "speed": 30,
+      "ability": [
+        { "cha": 2 },
+        { "choose": { "count": 2, "from": ["str","dex","con","int","wis"], "amount": 1 } }
+      ],
+      "entries": ["半精靈融合了人類的適應力與精靈的優雅。"]
+    },
+    {
+      "name": "半獸人",
+      "source": "PHB",
+      "speed": 30,
+      "ability": [
+        { "str": 2, "con": 1 }
+      ],
+      "entries": ["半獸人兼具獸人的力量與人類的理性，天生的戰士。"]
+    },
+    {
+      "name": "提夫林",
+      "source": "PHB",
+      "speed": 30,
+      "ability": [
+        { "int": 1, "cha": 2 }
+      ],
+      "entries": ["提夫林帶著地獄血脈的印記，卻以自己的力量書寫命運。"]
+    }
+  ]
+}

@@ -1,0 +1,222 @@
+{
+  "_note": "此為範例資料。請從 5etools 中文版複製完整的 classes.json",
+  "_source": "https://github.com/hazmole/TheGiddyLimit.github.io",
+  "class": [
+    {
+      "name": "野蠻人",
+      "source": "PHB",
+      "hd": { "number": 1, "faces": 12 },
+      "proficiency": ["str", "con"],
+      "startingProficiencies": {
+        "armor": ["light", "medium", "shields"],
+        "weapons": ["simple", "martial"],
+        "skills": [
+          {
+            "choose": {
+              "from": ["animalHandling", "athletics", "intimidation", "nature", "perception", "survival"],
+              "count": 2
+            }
+          }
+        ]
+      }
+    },
+    {
+      "name": "吟遊詩人",
+      "source": "PHB",
+      "hd": { "number": 1, "faces": 8 },
+      "proficiency": ["dex", "cha"],
+      "startingProficiencies": {
+        "armor": ["light"],
+        "weapons": ["simple", "hand crossbow", "longsword", "rapier", "shortsword"],
+        "skills": [
+          {
+            "choose": {
+              "from": ["athletics", "acrobatics", "arcana", "deception", "history", "insight", "intimidation", "investigation", "medicine", "nature", "perception", "performance", "persuasion", "religion", "sleightOfHand", "stealth", "survival", "animalHandling"],
+              "count": 3
+            }
+          }
+        ]
+      }
+    },
+    {
+      "name": "牧師",
+      "source": "PHB",
+      "hd": { "number": 1, "faces": 8 },
+      "proficiency": ["wis", "cha"],
+      "startingProficiencies": {
+        "armor": ["light", "medium", "shields"],
+        "weapons": ["simple"],
+        "skills": [
+          {
+            "choose": {
+              "from": ["history", "insight", "medicine", "persuasion", "religion"],
+              "count": 2
+            }
+          }
+        ]
+      }
+    },
+    {
+      "name": "德魯伊",
+      "source": "PHB",
+      "hd": { "number": 1, "faces": 8 },
+      "proficiency": ["int", "wis"],
+      "startingProficiencies": {
+        "armor": ["light", "medium", "shields"],
+        "weapons": ["clubs", "daggers", "darts", "javelins", "maces", "quarterstaffs", "scimitars", "sickles", "slings", "spears"],
+        "skills": [
+          {
+            "choose": {
+              "from": ["arcana", "animalHandling", "insight", "medicine", "nature", "perception", "religion", "survival"],
+              "count": 2
+            }
+          }
+        ]
+      }
+    },
+    {
+      "name": "戰士",
+      "source": "PHB",
+      "hd": { "number": 1, "faces": 10 },
+      "proficiency": ["str", "con"],
+      "startingProficiencies": {
+        "armor": ["light", "medium", "heavy", "shields"],
+        "weapons": ["simple", "martial"],
+        "skills": [
+          {
+            "choose": {
+              "from": ["acrobatics", "animalHandling", "athletics", "history", "insight", "intimidation", "perception", "survival"],
+              "count": 2
+            }
+          }
+        ]
+      }
+    },
+    {
+      "name": "武僧",
+      "source": "PHB",
+      "hd": { "number": 1, "faces": 8 },
+      "proficiency": ["str", "dex"],
+      "startingProficiencies": {
+        "armor": [],
+        "weapons": ["simple", "shortsword"],
+        "skills": [
+          {
+            "choose": {
+              "from": ["acrobatics", "athletics", "history", "insight", "religion", "stealth"],
+              "count": 2
+            }
+          }
+        ]
+      }
+    },
+    {
+      "name": "聖武士",
+      "source": "PHB",
+      "hd": { "number": 1, "faces": 10 },
+      "proficiency": ["wis", "cha"],
+      "startingProficiencies": {
+        "armor": ["light", "medium", "heavy", "shields"],
+        "weapons": ["simple", "martial"],
+        "skills": [
+          {
+            "choose": {
+              "from": ["athletics", "insight", "intimidation", "medicine", "persuasion", "religion"],
+              "count": 2
+            }
+          }
+        ]
+      }
+    },
+    {
+      "name": "遊俠",
+      "source": "PHB",
+      "hd": { "number": 1, "faces": 10 },
+      "proficiency": ["str", "dex"],
+      "startingProficiencies": {
+        "armor": ["light", "medium", "shields"],
+        "weapons": ["simple", "martial"],
+        "skills": [
+          {
+            "choose": {
+              "from": ["animalHandling", "athletics", "insight", "investigation", "nature", "perception", "stealth", "survival"],
+              "count": 3
+            }
+          }
+        ]
+      }
+    },
+    {
+      "name": "盜賊",
+      "source": "PHB",
+      "hd": { "number": 1, "faces": 8 },
+      "proficiency": ["dex", "int"],
+      "startingProficiencies": {
+        "armor": ["light"],
+        "weapons": ["simple", "hand crossbow", "longsword", "rapier", "shortsword"],
+        "skills": [
+          {
+            "choose": {
+              "from": ["acrobatics", "athletics", "deception", "insight", "intimidation", "investigation", "perception", "performance", "persuasion", "sleightOfHand", "stealth"],
+              "count": 4
+            }
+          }
+        ]
+      }
+    },
+    {
+      "name": "術士",
+      "source": "PHB",
+      "hd": { "number": 1, "faces": 6 },
+      "proficiency": ["con", "cha"],
+      "startingProficiencies": {
+        "armor": [],
+        "weapons": ["daggers", "darts", "slings", "quarterstaffs", "light crossbow"],
+        "skills": [
+          {
+            "choose": {
+              "from": ["arcana", "deception", "insight", "intimidation", "persuasion", "religion"],
+              "count": 2
+            }
+          }
+        ]
+      }
+    },
+    {
+      "name": "魔契者",
+      "source": "PHB",
+      "hd": { "number": 1, "faces": 8 },
+      "proficiency": ["wis", "cha"],
+      "startingProficiencies": {
+        "armor": ["light"],
+        "weapons": ["simple"],
+        "skills": [
+          {
+            "choose": {
+              "from": ["arcana", "deception", "history", "intimidation", "investigation", "nature", "religion"],
+              "count": 2
+            }
+          }
+        ]
+      }
+    },
+    {
+      "name": "法師",
+      "source": "PHB",
+      "hd": { "number": 1, "faces": 6 },
+      "proficiency": ["int", "wis"],
+      "startingProficiencies": {
+        "armor": [],
+        "weapons": ["daggers", "darts", "slings", "quarterstaffs", "light crossbow"],
+        "skills": [
+          {
+            "choose": {
+              "from": ["arcana", "history", "insight", "investigation", "medicine", "religion"],
+              "count": 2
+            }
+          }
+        ]
+      }
+    }
+  ]
+}

@@ -1,0 +1,90 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  html {
+    font-family: Georgia, 'Times New Roman', serif;
+  }
+
+  body {
+    @apply bg-dnd-darker text-gray-100 min-h-screen;
+  }
+
+  ::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+  }
+  ::-webkit-scrollbar-track {
+    @apply bg-dnd-dark;
+  }
+  ::-webkit-scrollbar-thumb {
+    @apply bg-dnd-border rounded;
+  }
+  ::-webkit-scrollbar-thumb:hover {
+    @apply bg-dnd-gold;
+  }
+}
+
+@layer components {
+  .card {
+    @apply bg-dnd-card border border-dnd-border rounded-lg p-4;
+  }
+
+  .card-hover {
+    @apply card cursor-pointer transition-all duration-200
+      hover:border-dnd-gold hover:shadow-lg hover:shadow-dnd-gold/10;
+  }
+
+  .card-selected {
+    @apply border-dnd-gold bg-dnd-dark shadow-lg shadow-dnd-gold/20;
+  }
+
+  .btn-primary {
+    @apply px-6 py-2 bg-dnd-red hover:bg-red-700 text-white rounded-lg
+      font-semibold transition-colors disabled:opacity-40 disabled:cursor-not-allowed;
+  }
+
+  .btn-secondary {
+    @apply px-6 py-2 bg-dnd-border hover:bg-gray-600 text-white rounded-lg
+      font-semibold transition-colors disabled:opacity-40 disabled:cursor-not-allowed;
+  }
+
+  .btn-gold {
+    @apply px-6 py-2 bg-dnd-gold hover:bg-yellow-500 text-dnd-darker rounded-lg
+      font-bold transition-colors disabled:opacity-40 disabled:cursor-not-allowed;
+  }
+
+  .section-title {
+    @apply text-dnd-gold font-bold text-lg border-b border-dnd-border pb-2 mb-4;
+  }
+
+  .tag {
+    @apply inline-block px-2 py-0.5 text-xs rounded bg-dnd-border text-gray-300;
+  }
+
+  .tag-gold {
+    @apply tag bg-dnd-gold/20 text-dnd-gold border border-dnd-gold/30;
+  }
+
+  .damage-text {
+    @apply text-orange-400 font-semibold;
+  }
+
+  .spell-ref {
+    @apply text-blue-300 italic;
+  }
+
+  .condition-text {
+    @apply text-yellow-300 underline decoration-dotted cursor-help;
+  }
+
+  .input-field {
+    @apply bg-dnd-dark border border-dnd-border rounded px-3 py-2 text-gray-100
+      focus:outline-none focus:border-dnd-gold transition-colors w-full;
+  }
+
+  .select-field {
+    @apply input-field appearance-none cursor-pointer;
+  }
+}

@@ -1,0 +1,78 @@
+{
+  "_note": "此為範例資料。請從 5etools 中文版複製完整的 backgrounds.json",
+  "_source": "https://github.com/hazmole/TheGiddyLimit.github.io",
+  "background": [
+    {
+      "name": "侍僧",
+      "source": "PHB",
+      "skillProficiencies": [{ "insight": true, "religion": true }],
+      "entries": ["你在神聖的環境中成長，侍奉神靈或宗教組織。"]
+    },
+    {
+      "name": "罪犯",
+      "source": "PHB",
+      "skillProficiencies": [{ "deception": true, "stealth": true }],
+      "entries": ["你曾是犯罪組織的一員，精通不為人道的手段。"]
+    },
+    {
+      "name": "藝人",
+      "source": "PHB",
+      "skillProficiencies": [{ "acrobatics": true, "performance": true }],
+      "entries": ["你以表演維生，擅長娛樂觀眾並博得他們的喜愛。"]
+    },
+    {
+      "name": "貴族",
+      "source": "PHB",
+      "skillProficiencies": [{ "history": true, "persuasion": true }],
+      "entries": ["你出身貴族家庭，習慣了優渥的生活與政治手腕。"]
+    },
+    {
+      "name": "英雄",
+      "source": "PHB",
+      "skillProficiencies": [{ "athletics": true, "survival": true }],
+      "entries": ["你曾是英雄或戰士，在戰場上磨練出過人的體魄與意志。"]
+    },
+    {
+      "name": "民間英雄",
+      "source": "PHB",
+      "skillProficiencies": [{ "animalHandling": true, "survival": true }],
+      "entries": ["你來自平民百姓，以非凡的勇氣在艱難時刻挺身而出。"]
+    },
+    {
+      "name": "行會工匠",
+      "source": "PHB",
+      "skillProficiencies": [{ "insight": true, "persuasion": true }],
+      "entries": ["你是工匠行會的成員，掌握精湛的工藝與商業往來的技巧。"]
+    },
+    {
+      "name": "隱士",
+      "source": "PHB",
+      "skillProficiencies": [{ "medicine": true, "religion": true }],
+      "entries": ["你曾在與世隔絕的地方生活，尋求啟示或靜修。"]
+    },
+    {
+      "name": "水手",
+      "source": "PHB",
+      "skillProficiencies": [{ "athletics": true, "perception": true }],
+      "entries": ["你曾在海上航行，習慣了風浪與廣闊的視野。"]
+    },
+    {
+      "name": "士兵",
+      "source": "PHB",
+      "skillProficiencies": [{ "athletics": true, "intimidation": true }],
+      "entries": ["你曾在軍隊中服役，在紀律與戰鬥中磨練自我。"]
+    },
+    {
+      "name": "流浪者",
+      "source": "PHB",
+      "skillProficiencies": [{ "athletics": true, "survival": true }],
+      "entries": ["你在荒野中獨自生活，熟悉大自然的法則與危險。"]
+    },
+    {
+      "name": "聖人",
+      "source": "PHB",
+      "skillProficiencies": [{ "arcana": true, "history": true }],
+      "entries": ["你以追求知識為畢生志業，在圖書館或學術機構度過多年。"]
+    }
+  ]
+}

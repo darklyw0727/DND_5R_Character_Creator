@@ -1,0 +1,54 @@
+{
+  "_note": "此為範例資料。請從 5etools 中文版複製完整的 feats.json",
+  "_source": "https://github.com/hazmole/TheGiddyLimit.github.io",
+  "feat": [
+    {
+      "name": "警覺",
+      "source": "PHB",
+      "ability": [],
+      "entries": ["先攻 +5，且不會在驚愕狀態下被偷襲。"]
+    },
+    {
+      "name": "運動員",
+      "source": "PHB",
+      "ability": [{ "choose": { "count": 1, "from": ["str","dex"], "amount": 1 } }],
+      "entries": ["強化你的體能，讓移動更加靈活。"]
+    },
+    {
+      "name": "演員",
+      "source": "PHB",
+      "ability": [{ "cha": 1 }],
+      "entries": ["精通模仿他人聲音與舉止的技藝。"]
+    },
+    {
+      "name": "戰車駕駛",
+      "source": "PHB",
+      "ability": [{ "choose": { "count": 1, "from": ["str","dex","con","int","wis","cha"], "amount": 1 } }],
+      "entries": ["你擁有多方面的才能。"]
+    },
+    {
+      "name": "耐力",
+      "source": "PHB",
+      "ability": [{ "con": 1 }],
+      "entries": ["增強體質，提升在特定條件下的生存能力。"]
+    },
+    {
+      "name": "大師射手",
+      "source": "PHB",
+      "ability": [],
+      "entries": ["以遠程武器進行超遠程射擊，無視掩護加值。"]
+    },
+    {
+      "name": "熟練技能",
+      "source": "PHB",
+      "ability": [],
+      "entries": ["額外獲得兩項技能的熟練加值。"]
+    },
+    {
+      "name": "戰術大師",
+      "source": "PHB",
+      "ability": [],
+      "entries": ["擁有三個上等戰技，以及一個上等骰。"]
+    }
+  ]
+}
