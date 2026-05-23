@@ -214,20 +214,33 @@ export interface RawClassFile {
 }
 
 // ─── 種族相關 ────────────────────────────────────────────────────
+export interface RaceVersionModOp {
+  mode: string
+  replace?: string
+  names?: string | string[]
+  items?: Entry | Entry[]
+}
+
 export interface RaceVersionMod {
-  entries?: {
-    mode: string
-    replace?: string
-    items?: Entry | Entry[]
-  } | {
-    mode: string
-    replace?: string
-    items?: Entry | Entry[]
-  }[]
+  entries?: RaceVersionModOp | RaceVersionModOp[]
+}
+
+export interface RaceVersionAbstract {
+  name: string
+  source?: string
+  _mod?: RaceVersionMod
+}
+
+export interface RaceVersionImplementation {
+  _variables: Record<string, string>
+  resist?: (string | { choose: { from: string[] } })[]
+  darkvision?: number
+  speed?: number | { walk?: number; fly?: number }
+  additionalSpells?: unknown[]
 }
 
 export interface RaceVersion {
-  name: string
+  name?: string
   source?: string
   _mod?: RaceVersionMod
   darkvision?: number
@@ -235,6 +248,9 @@ export interface RaceVersion {
   additionalSpells?: unknown[]
   entries?: Entry[]
   traitTags?: string[]
+  // Template form (e.g. Dragonborn XPHB)
+  _abstract?: RaceVersionAbstract
+  _implementations?: RaceVersionImplementation[]
 }
 
 export interface RawRace {
