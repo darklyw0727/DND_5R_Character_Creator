@@ -6,6 +6,7 @@ import { CLASS_NAME_ZH, CASTING_CLASSES } from '../../data/classConstants'
 import {
   FULL_CASTER_SLOTS, HALF_CASTER_SLOTS, WARLOCK_PACT_SLOTS,
 } from '../../data/abilityScoreData'
+import { SPELL_NAME_ZH } from '../../data/zhTranslations'
 import EntryRenderer from '../shared/EntryRenderer'
 import type { ParsedSpell } from '../../services/spellParser'
 
@@ -55,7 +56,10 @@ export default function Step6Spells() {
   const filteredSpells = classSpells.filter(s => {
     if (filterLevel !== null && s.level !== filterLevel) return false
     if (filterSchool && s.schoolLabel !== filterSchool) return false
-    if (search && !s.name.toLowerCase().includes(search.toLowerCase())) return false
+    if (search) {
+      const zhName = SPELL_NAME_ZH[s.name] ?? ''
+      if (!s.name.toLowerCase().includes(search.toLowerCase()) && !zhName.includes(search)) return false
+    }
     return true
   })
 
@@ -190,7 +194,7 @@ export default function Step6Spells() {
                   </button>
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-2 flex-wrap">
-                      <span className="font-semibold text-gray-100">{spell.name}</span>
+                      <span className="font-semibold text-gray-100">{SPELL_NAME_ZH[spell.name] ?? spell.name}</span>
                       <span className="tag text-xs">
                         {spell.level === 0 ? '戲法' : `${spell.level}環`}
                       </span>

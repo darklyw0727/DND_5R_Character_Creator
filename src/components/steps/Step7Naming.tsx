@@ -1,5 +1,7 @@
+import { useState } from 'react'
 import { useCharacterStore, selectFinalAbilityScores } from '../../store/characterStore'
 import { CLASS_NAME_ZH, CLASS_COLOR } from '../../data/classConstants'
+import { FEAT_NAME_ZH, SPELL_NAME_ZH, RACE_NAME_ZH, BACKGROUND_NAME_ZH, CLASS_FEATURE_NAME_ZH } from '../../data/zhTranslations'
 import {
   ABILITY_LABELS, ABILITY_KEYS, getModifier, formatModifier, getProficiencyBonus,
   FULL_CASTER_SLOTS, HALF_CASTER_SLOTS, WARLOCK_PACT_SLOTS, MULTICLASS_SPELL_SLOTS,
@@ -7,8 +9,18 @@ import {
 import { useClassData } from '../../hooks/useClassData'
 import { useRaceData } from '../../hooks/useRaceData'
 import { useBackgroundData } from '../../hooks/useBackgroundData'
+import { useFeatData } from '../../hooks/useFeatData'
 import { SIZE_LABEL } from '../../services/raceParser'
+import { EntryBlock } from '../ui/EntryBlock'
 import type { AbilityKey } from '../../types/character'
+
+type FeatureInfo = {
+  displayName: string       // 顯示名稱（可能含 ★）
+  name: string              // 實際名稱（供查找）
+  level: number
+  kind: 'class' | 'subclass-gain' | 'subclass'
+  lookupKey: string         // Map key 供查找 entries
+}
 
 // ── 常數 ────────────────────────────────────────────────────────────────────
 
@@ -81,6 +93,12 @@ export default function Step7Naming() {
   const { data: classDataMap } = useClassData()
   const { data: raceDataList  } = useRaceData()
   const { data: bgDataList    } = useBackgroundData()
+  const { data: featDataMap   } = useFeatData()
+
+  // 展開/折疊狀態（key = 查找鍵）
+  const [expanded, setExpanded] = useState<Record<string, boolean>>({})
+  const toggle = (key: string) =>
+    setExpanded(p => ({ ...p, [key]: !p[key] }))
 
   const conMod = getModifier(finalScores.con)
   const dexMod = getModifier(finalScores.dex)
@@ -123,7 +141,7 @@ export default function Step7Naming() {
     ? (classDataMap.get(classes[0].className)?.summary.rawClass.proficiency ?? [])
     : []
 
-  const hasPerceptionProf = bgSkills.some(s => s.toLowerCase() === 'perception')
+  const hasPerceptionProf = bgSkills.some(s => s === '察覺')
   const passivePerception  = 10 + wisMod + (hasPerceptionProf ? profBonus : 0)
 
   const primarySkillEntry = classes.length > 0
@@ -134,16 +152,61 @@ export default function Step7Naming() {
   const asiFeats  = asiChoices.filter(a => a.choice === 'feat' && a.featName).map(a => a.featName!)
   const allFeats  = [...bgFeats, ...asiFeats]
 
-  // ── 職業特性 ──────────────────────────────────────────────────────────────
+  // ── 職業特性（含子職業特性，帶查找鍵） ────────────────────────────────────
   const classFeaturesList = classes.map(cls => {
     const data = classDataMap.get(cls.className)
-    if (!data) return { cls, features: [] as string[] }
-    const features: string[] = []
+    if (!data) return { cls, features: [] as FeatureInfo[] }
+
+    const cn = cls.className
+    const features: FeatureInfo[] = []
+
+    // 職業特性（featuresByLevel）
     for (let lvl = 1; lvl <= cls.level; lvl++) {
-      features.push(...(data.summary.featuresByLevel.get(lvl) ?? []))
+      for (const displayName of (data.summary.featuresByLevel.get(lvl) ?? [])) {
+        const isSubclassGain = displayName.endsWith(' ★')
+        const name = isSubclassGain ? displayName.slice(0, -2) : displayName
+        features.push({
+          displayName,
+          name,
+          level: lvl,
+          kind: isSubclassGain ? 'subclass-gain' : 'class',
+          lookupKey: `${name}|${cn}|XPHB|${lvl}`.toLowerCase(),
+        })
+      }
     }
+
+    // 子職業特性（若已選子職業）
+    if (cls.subclassShortName) {
+      const subLower = cls.subclassShortName.toLowerCase()
+      for (const [key, sf] of data.subclassFeatures) {
+        if (key.includes(`|${cn.toLowerCase()}|xphb|${subLower}|xphb|`) && sf.level <= cls.level) {
+          features.push({
+            displayName: sf.name,
+            name: sf.name,
+            level: sf.level,
+            kind: 'subclass',
+            lookupKey: key,
+          })
+        }
+      }
+      features.sort((a, b) => a.level - b.level || a.displayName.localeCompare(b.displayName))
+    }
+
     return { cls, features }
   })
+
+  // entries 查找輔助
+  function getFeatureEntries(className: string, fi: FeatureInfo) {
+    const data = classDataMap.get(className)
+    if (!data) return null
+    return fi.kind === 'subclass'
+      ? (data.subclassFeatures.get(fi.lookupKey)?.entries ?? null)
+      : (data.features.get(fi.lookupKey)?.entries ?? null)
+  }
+
+  function getFeatEntries(featName: string) {
+    return featDataMap.get(featName.toLowerCase())?.entries ?? null
+  }
 
   // ── 施法職業分類 ──────────────────────────────────────────────────────────
   const nonWarlockCasters = classes.filter(cls =>
@@ -267,10 +330,10 @@ export default function Step7Naming() {
               <dd className="text-gray-100 font-semibold">{characterName || '（未設定）'}</dd>
               <dt className="text-gray-500">種族</dt>
               <dd className="text-gray-100">
-                {raceName ? (raceVariant ? `${raceName}（${raceVariant}）` : raceName) : '（未選擇）'}
+                {raceName ? (raceVariant ? `${RACE_NAME_ZH[raceName] ?? raceName}（${raceVariant}）` : (RACE_NAME_ZH[raceName] ?? raceName)) : '（未選擇）'}
               </dd>
               <dt className="text-gray-500">背景</dt>
-              <dd className="text-gray-100">{backgroundName ?? '（未選擇）'}</dd>
+              <dd className="text-gray-100">{backgroundName ? (BACKGROUND_NAME_ZH[backgroundName] ?? backgroundName) : '（未選擇）'}</dd>
               <dt className="text-gray-500">總等級</dt>
               <dd className="text-dnd-gold font-bold">{totalLevel}</dd>
               <dt className="text-gray-500">熟練加值</dt>
@@ -332,7 +395,7 @@ export default function Step7Naming() {
                       </div>
                       {/* 技能 */}
                       {skills.map(skill => {
-                        const proficient = bgSkills.some(s => s.toLowerCase() === skill.en.toLowerCase())
+                        const proficient = bgSkills.some(s => s === skill.zh)
                         const skillMod   = mod + (proficient ? profBonus : 0)
                         return (
                           <div key={skill.en} className="flex items-center gap-1.5 text-xs">
@@ -414,10 +477,33 @@ export default function Step7Naming() {
           {allFeats.length > 0 && (
             <div className="card">
               <h3 className="section-title">專長</h3>
-              <div className="flex flex-wrap gap-2">
-                {allFeats.map((feat, i) => (
-                  <span key={i} className="tag text-sm">{feat}</span>
-                ))}
+              <div className="divide-y divide-dnd-border/50">
+                {allFeats.map((feat, i) => {
+                  const key = `feat-${feat.toLowerCase()}`
+                  const entries = getFeatEntries(feat)
+                  const isOpen = expanded[key]
+                  return (
+                    <div key={i}>
+                      <button
+                        onClick={() => toggle(key)}
+                        className="flex items-center gap-2 w-full text-left py-1.5 hover:bg-dnd-dark/40 rounded px-1 -mx-1 group"
+                      >
+                        <span className="text-gray-500 w-3 text-[10px] flex-shrink-0">
+                          {isOpen ? '▼' : '▶'}
+                        </span>
+                        <span className="text-sm text-gray-200 group-hover:text-white capitalize">
+                          {FEAT_NAME_ZH[feat] ?? feat}
+                        </span>
+                        {!entries && <span className="text-[10px] text-gray-600 ml-auto">—</span>}
+                      </button>
+                      {isOpen && entries && (
+                        <div className="ml-4 pb-2 pl-2 border-l border-dnd-border/40">
+                          <EntryBlock entries={entries} />
+                        </div>
+                      )}
+                    </div>
+                  )
+                })}
               </div>
             </div>
           )}
@@ -426,12 +512,13 @@ export default function Step7Naming() {
           {classFeaturesList.some(c => c.features.length > 0) && (
             <div className="card">
               <h3 className="section-title">職業特性</h3>
-              <div className="space-y-3">
-                {classFeaturesList.map(({ cls, features }, i) => {
+              <div className="space-y-4">
+                {classFeaturesList.map(({ cls, features }, gi) => {
                   if (!features.length) return null
                   const color = CLASS_COLOR[cls.className] ?? '#888'
                   return (
-                    <div key={i}>
+                    <div key={gi}>
+                      {/* 職業標題 */}
                       <div className="flex items-center gap-2 mb-1.5">
                         <span
                           className="text-xs font-semibold px-2 py-0.5 rounded-full text-dnd-darker"
@@ -440,15 +527,42 @@ export default function Step7Naming() {
                           {CLASS_NAME_ZH[cls.className] ?? cls.className} Lv{cls.level}
                         </span>
                       </div>
-                      <div className="flex flex-wrap gap-1 max-h-32 overflow-y-auto">
-                        {features.map((feat, fi) => (
-                          <span
-                            key={fi}
-                            className={`tag text-xs ${feat.endsWith('★') ? 'border-dnd-gold/40 text-dnd-gold/80' : ''}`}
-                          >
-                            {feat}
-                          </span>
-                        ))}
+                      {/* 特性列表 */}
+                      <div className="divide-y divide-dnd-border/40">
+                        {features.map((fi, fIdx) => {
+                          const isOpen = expanded[fi.lookupKey]
+                          const entries = getFeatureEntries(cls.className, fi)
+                          const isSubclass = fi.kind === 'subclass'
+                          const isGain = fi.kind === 'subclass-gain'
+                          return (
+                            <div key={fIdx}>
+                              <button
+                                onClick={() => entries && toggle(fi.lookupKey)}
+                                className={`flex items-center gap-2 w-full text-left py-1 px-1 -mx-1 rounded
+                                  ${entries ? 'hover:bg-dnd-dark/40 cursor-pointer group' : 'cursor-default'}`}
+                              >
+                                <span className="text-gray-600 w-3 text-[10px] flex-shrink-0">
+                                  {entries ? (isOpen ? '▼' : '▶') : '·'}
+                                </span>
+                                <span className={`text-xs ${
+                                  isSubclass ? 'text-dnd-gold/90' :
+                                  isGain     ? 'text-dnd-gold/60 italic' :
+                                               'text-gray-300 group-hover:text-white'
+                                }`}>
+                                  {(CLASS_FEATURE_NAME_ZH[fi.name] ?? fi.name)}{fi.kind === 'subclass-gain' ? ' ★' : ''}
+                                </span>
+                                <span className="text-[10px] text-gray-700 ml-auto">
+                                  Lv{fi.level}
+                                </span>
+                              </button>
+                              {isOpen && entries && (
+                                <div className="ml-4 pb-2 pl-2 border-l border-dnd-border/40">
+                                  <EntryBlock entries={entries} />
+                                </div>
+                              )}
+                            </div>
+                          )
+                        })}
                       </div>
                     </div>
                   )
@@ -544,7 +658,7 @@ export default function Step7Naming() {
                       {prepared.length > 0 && (
                         <div className="flex flex-wrap gap-1 mb-1">
                           {prepared.map(sp => (
-                            <span key={sp.spellName} className="tag text-xs">{sp.spellName}</span>
+                            <span key={sp.spellName} className="tag text-xs">{SPELL_NAME_ZH[sp.spellName] ?? sp.spellName}</span>
                           ))}
                         </div>
                       )}
@@ -552,7 +666,7 @@ export default function Step7Naming() {
                         <div className="flex flex-wrap gap-1">
                           {cantrips.map(sp => (
                             <span key={sp.spellName} className="tag text-xs opacity-60">
-                              {sp.spellName} ★
+                              {SPELL_NAME_ZH[sp.spellName] ?? sp.spellName} ★
                             </span>
                           ))}
                         </div>

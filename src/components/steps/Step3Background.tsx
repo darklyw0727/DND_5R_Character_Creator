@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { useCharacterStore } from '../../store/characterStore'
 import { useBackgroundData } from '../../hooks/useBackgroundData'
+import { BACKGROUND_NAME_ZH, FEAT_NAME_ZH } from '../../data/zhTranslations'
 import EntryRenderer from '../shared/EntryRenderer'
 import type { ParsedBackground } from '../../services/backgroundParser'
 import type { StartingEquipmentData } from '../../types/5etools'
@@ -61,7 +62,7 @@ export default function Step3Background() {
                 >
                   <div className="flex justify-between items-start">
                     <div>
-                      <div className="font-bold text-gray-100">{bg.name}</div>
+                      <div className="font-bold text-gray-100">{BACKGROUND_NAME_ZH[bg.name] ?? bg.name}</div>
                       {bg.skillProficiencies.length > 0 && (
                         <div className="text-xs text-gray-400 mt-1">
                           技能：{bg.skillProficiencies.join('、')}
@@ -78,7 +79,7 @@ export default function Step3Background() {
                   {bg.featNames.length > 0 && (
                     <div className="mt-1 flex gap-1 flex-wrap">
                       {bg.featNames.map(f => (
-                        <span key={f} className="tag-gold text-xs">{f}</span>
+                        <span key={f} className="tag-gold text-xs">{FEAT_NAME_ZH[f] ?? f}</span>
                       ))}
                     </div>
                   )}
@@ -92,7 +93,7 @@ export default function Step3Background() {
         <div>
           {selected ? (
             <div className="card">
-              <h3 className="text-lg font-bold text-dnd-gold mb-3">{selected.name}</h3>
+              <h3 className="text-lg font-bold text-dnd-gold mb-3">{BACKGROUND_NAME_ZH[selected.name] ?? selected.name}</h3>
 
               {/* 熟練與語言 */}
               <div className="grid grid-cols-2 gap-3 mb-4">

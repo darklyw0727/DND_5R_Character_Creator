@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { useCharacterStore } from '../../store/characterStore'
 import { useClassData } from '../../hooks/useClassData'
 import { CLASS_NAME_ZH, CLASS_COLOR } from '../../data/classConstants'
+import { CLASS_FEATURE_NAME_ZH } from '../../data/zhTranslations'
 import { ABILITY_LABELS, ABILITY_KEYS } from '../../data/abilityScoreData'
 import EntryRenderer from '../shared/EntryRenderer'
 import { getFeaturesUpToLevel } from '../../services/classParser'
@@ -33,7 +34,7 @@ export default function Step5ClassDetails() {
           步驟五：職業細節
         </h2>
         <p className="text-gray-400 text-sm">
-          配置你的職業特性、子職業選擇、能力值提升，以及起始裝備。
+          配置你的職業特性、子職業選擇、屬性值提升，以及起始裝備。
         </p>
       </div>
 
@@ -223,7 +224,7 @@ function FeatureCard({
         >
           Lv{level}
         </span>
-        <span className="font-semibold text-gray-100 flex-1">{name}</span>
+        <span className="font-semibold text-gray-100 flex-1">{CLASS_FEATURE_NAME_ZH[name] ?? name}</span>
         <span className="text-gray-500 text-sm">{expanded ? '▲' : '▼'}</span>
       </button>
       {expanded && (
@@ -275,8 +276,14 @@ function SubclassSelector({
                 : 'border-dnd-border hover:border-gray-500 text-gray-300'
               }`}
           >
-            <div className="font-semibold">{sc.shortName}</div>
-            <div className="text-xs text-gray-500 mt-0.5">{sc.name}</div>
+            {(() => {
+              const zhShort = CLASS_FEATURE_NAME_ZH[sc.shortName] ?? sc.shortName
+              const zhName  = CLASS_FEATURE_NAME_ZH[sc.name] ?? sc.name
+              return <>
+                <div className="font-semibold">{zhShort}</div>
+                {zhName !== zhShort && <div className="text-xs text-gray-500 mt-0.5">{zhName}</div>}
+              </>
+            })()}
           </button>
         ))}
       </div>
@@ -304,7 +311,7 @@ function SubclassSelector({
             return (
               <div key={i} className="text-sm">
                 <div className="font-semibold text-parchment-300 mb-1">
-                  {name} <span className="text-xs text-gray-500">(Lv{level})</span>
+                  {CLASS_FEATURE_NAME_ZH[name] ?? name} <span className="text-xs text-gray-500">(Lv{level})</span>
                 </div>
                 {featureData
                   ? <EntryRenderer entries={featureData.entries} />
@@ -338,7 +345,7 @@ function ASIFeature({
           Lv{featureLevel}
         </span>
         <span className="font-semibold text-gray-100">
-          {isEpicBoon ? 'Epic Boon' : 'Ability Score Improvement'}
+          {isEpicBoon ? '傳奇恩惠' : '屬性值提升'}
         </span>
       </div>
 
@@ -352,7 +359,7 @@ function ASIFeature({
                 : 'border-dnd-border hover:border-gray-500 text-gray-400'
               }`}
           >
-            +2 能力值 or +1/+1
+            +2 屬性值 或 +1/+1
           </button>
           <button
             onClick={() => onSet({ choice: 'feat' })}
@@ -362,7 +369,7 @@ function ASIFeature({
                 : 'border-dnd-border hover:border-gray-500 text-gray-400'
               }`}
           >
-            選擇 Feat
+            選擇專長
           </button>
         </div>
       )}
@@ -404,10 +411,10 @@ function ASIFeature({
       {(choice === 'feat' || isEpicBoon) && (
         <div>
           <p className="text-sm text-gray-400">
-            {isEpicBoon ? 'Epic Boon Feat（等級19）' : '選擇一個 General Feat'}
+            {isEpicBoon ? '傳奇恩惠（等級19）' : '選擇一個通用專長'}
           </p>
           <input
-            placeholder="輸入 Feat 名稱…"
+            placeholder="輸入專長名稱…"
             value={current?.featName ?? ''}
             onChange={e => onSet({ choice: 'feat', featName: e.target.value })}
             className="input-field mt-2 text-sm"

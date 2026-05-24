@@ -1,4 +1,5 @@
 import type { RawBackgroundFile, RawBackground, StartingEquipmentData } from '../types/5etools'
+import { BACKGROUND_NAME_ZH } from '../data/zhTranslations'
 
 export interface ParsedBackground {
   name: string
@@ -86,16 +87,16 @@ export function parseBackgroundFile(raw: RawBackgroundFile): ParsedBackground[] 
 }
 
 const SKILL_LABEL: Record<string, string> = {
-  acrobatics: 'Acrobatics', animalHandling: 'Animal Handling',
-  arcana: 'Arcana', athletics: 'Athletics', deception: 'Deception',
-  history: 'History', insight: 'Insight', intimidation: 'Intimidation',
-  investigation: 'Investigation', medicine: 'Medicine', nature: 'Nature',
-  perception: 'Perception', performance: 'Performance', persuasion: 'Persuasion',
-  religion: 'Religion', sleightOfHand: 'Sleight of Hand', stealth: 'Stealth',
-  survival: 'Survival',
+  acrobatics: '體操', animalHandling: '馴獸',
+  arcana: '奧秘', athletics: '運動', deception: '欺瞞',
+  history: '歷史', insight: '洞悉', intimidation: '威嚇',
+  investigation: '調查', medicine: '醫療', nature: '自然',
+  perception: '察覺', performance: '表演', persuasion: '遊說',
+  religion: '宗教', sleightOfHand: '巧手', stealth: '隱匿',
+  survival: '求生',
 }
 
 const ABILITY_LABEL: Record<string, string> = {
-  str: 'Strength', dex: 'Dexterity', con: 'Constitution',
-  int: 'Intelligence', wis: 'Wisdom', cha: 'Charisma',
+  str: '力量', dex: '敏捷', con: '體質',
+  int: '智力', wis: '感知', cha: '魅力',
 }

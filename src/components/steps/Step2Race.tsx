@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { useCharacterStore } from '../../store/characterStore'
 import { useRaceData } from '../../hooks/useRaceData'
 import { SIZE_LABEL } from '../../services/raceParser'
+import { RACE_NAME_ZH } from '../../data/zhTranslations'
 import EntryRenderer from '../shared/EntryRenderer'
 import type { ParsedRace } from '../../services/raceParser'
 
@@ -44,12 +45,12 @@ export default function Step2Race() {
               >
                 <div className="flex items-start gap-3">
                   <div className="flex-1">
-                    <div className="font-bold text-gray-100">{race.name}</div>
+                    <div className="font-bold text-gray-100">{RACE_NAME_ZH[race.name] ?? race.name}</div>
                     <div className="flex gap-2 mt-1 flex-wrap">
                       <span className="tag">{SIZE_LABEL[race.size] ?? race.size}型</span>
-                      <span className="tag">速度 {race.walkSpeed}ft</span>
-                      {race.flySpeed && <span className="tag-gold">飛行 {race.flySpeed}ft</span>}
-                      {race.darkvision && <span className="tag">暗視 {race.darkvision}ft</span>}
+                      <span className="tag">速度 {race.walkSpeed}呎</span>
+                      {race.flySpeed && <span className="tag-gold">飛行 {race.flySpeed}呎</span>}
+                      {race.darkvision && <span className="tag">暗視 {race.darkvision}呎</span>}
                       {race.variants && <span className="tag-gold">{race.variants.length} 個亞種</span>}
                     </div>
                   </div>
@@ -84,14 +85,14 @@ export default function Step2Race() {
         <div>
           {selected ? (
             <div className="card sticky top-4">
-              <h3 className="text-lg font-bold text-dnd-gold mb-1">{selected.name}</h3>
+              <h3 className="text-lg font-bold text-dnd-gold mb-1">{RACE_NAME_ZH[selected.name] ?? selected.name}</h3>
               {raceVariant && <p className="text-parchment-300 text-sm mb-2">亞種：{raceVariant}</p>}
 
               <div className="grid grid-cols-3 gap-2 mb-4 text-xs">
                 <InfoItem label="體型" value={`${SIZE_LABEL[selected.size] ?? selected.size}型`} />
-                <InfoItem label="移動速度" value={`${selected.walkSpeed} ft`} />
-                {selected.darkvision && <InfoItem label="暗視" value={`${selected.darkvision} ft`} />}
-                {selected.flySpeed && <InfoItem label="飛行速度" value={`${selected.flySpeed} ft`} />}
+                <InfoItem label="移動速度" value={`${selected.walkSpeed} 呎`} />
+                {selected.darkvision && <InfoItem label="暗視" value={`${selected.darkvision} 呎`} />}
+                {selected.flySpeed && <InfoItem label="飛行速度" value={`${selected.flySpeed} 呎`} />}
                 <InfoItem label="生物類型" value={selected.creatureTypes.join('、')} />
               </div>
 

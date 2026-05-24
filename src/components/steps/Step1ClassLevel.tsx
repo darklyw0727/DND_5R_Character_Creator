@@ -239,7 +239,7 @@ function ClassTablePreview({ group }: { group: ClassTableGroup }) {
       <table className="text-xs w-full">
         <thead>
           <tr>
-            <th className="text-left text-gray-500 pr-2">Lv</th>
+            <th className="text-left text-gray-500 pr-2">等級</th>
             {group.colLabels.map((col, i) => (
               <th key={i} className="text-left text-gray-500 pr-2">{col}</th>
             ))}

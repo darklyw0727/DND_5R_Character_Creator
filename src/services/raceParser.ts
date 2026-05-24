@@ -1,4 +1,5 @@
 import type { RawRaceFile, RawRace, RaceVersion, Entry, RaceVersionMod } from '../types/5etools'
+import { RACE_NAME_ZH } from '../data/zhTranslations'
 
 export interface ParsedRace {
   name: string
