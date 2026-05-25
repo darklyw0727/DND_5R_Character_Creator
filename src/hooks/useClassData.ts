@@ -5,6 +5,7 @@ import type { ParsedClassFile } from '../services/classParser'
 import type { RawClassFile, Entry } from '../types/5etools'
 
 interface ZhOverlay {
+  overview?: string[]
   classFeature?: Record<string, Entry[]>
   subclassFeature?: Record<string, Entry[]>
 }
@@ -30,7 +31,7 @@ function applyZhOverlay(parsed: ParsedClassFile, overlay: ZhOverlay): ParsedClas
     const existing = subclassFeatures.get(key)
     if (existing) subclassFeatures.set(key, { ...existing, entries })
   }
-  return { ...parsed, features, subclassFeatures }
+  return { ...parsed, overview: overlay.overview, features, subclassFeatures }
 }
 
 interface State {

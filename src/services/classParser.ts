@@ -28,6 +28,7 @@ export interface ClassSummary {
 
 export interface ParsedClassFile {
   summary: ClassSummary
+  overview?: string[]
   features: Map<string, RawClassFeature>         // key: "name|className|XPHB|level" (lowercase)
   subclasses: RawSubclass[]                       // XPHB 子職業
   subclassFeatures: Map<string, RawSubclassFeature> // key: "name|className|XPHB|shortName|XPHB|level" (lowercase)

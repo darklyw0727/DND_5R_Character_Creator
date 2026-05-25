@@ -1,9 +1,7 @@
 import { useState } from 'react'
 import { useCharacterStore } from '../../store/characterStore'
 import { useClassData } from '../../hooks/useClassData'
-import { CLASS_NAME_ZH, CLASS_COLOR, SKILL_LABEL_ZH } from '../../data/classConstants'
-import EntryRenderer from '../shared/EntryRenderer'
-import type { ClassTableGroup } from '../../types/5etools'
+import { CLASS_NAME_ZH, CLASS_COLOR } from '../../data/classConstants'
 
 export default function Step1ClassLevel() {
   const { classes, addClass, removeClass, setClassLevel } = useCharacterStore()
@@ -152,7 +150,10 @@ export default function Step1ClassLevel() {
 
               {/* 展開詳情 */}
               {isExpanded && (
-                <ClassDetail summary={summary} featuresByLevel={summary.featuresByLevel} />
+                <ClassDetail
+                  summary={summary}
+                  overview={classMap.get(summary.name)?.overview}
+                />
               )}
             </div>
           )
@@ -162,12 +163,10 @@ export default function Step1ClassLevel() {
   )
 }
 
-function ClassDetail({ summary, featuresByLevel }: {
+function ClassDetail({ summary, overview }: {
   summary: import('../../services/classParser').ClassSummary
-  featuresByLevel: Map<number, string[]>
+  overview?: string[]
 }) {
-  const color = CLASS_COLOR[summary.name] ?? '#888'
-
   return (
     <div className="mt-1 card border-t-0 rounded-t-none text-sm space-y-3">
       {/* 基本資訊 */}
@@ -186,80 +185,18 @@ function ClassDetail({ summary, featuresByLevel }: {
             <span className="text-gray-200">{summary.spellcastingAbility.toUpperCase()}</span>
           </div>
         )}
-        <div>
-          <span className="text-gray-500">子職業：</span>
-          <span className="text-gray-200">{summary.subclassTitle}</span>
-        </div>
       </div>
 
-      {/* 技能熟練選擇 */}
-      {summary.startingProficiencies.skills?.map((skill, i) => (
-        <div key={i} className="text-xs">
-          <span className="text-gray-500">技能（選 {skill.choose.count}）：</span>
-          <span className="text-gray-300">
-            {skill.choose.from.map(s => SKILL_LABEL_ZH[s] ?? s).join('、')}
-          </span>
-        </div>
-      ))}
-
-      {/* 等級特性預覽 */}
-      <div>
-        <p className="text-xs text-gray-500 mb-2">等級特性預覽：</p>
-        <div className="space-y-1 max-h-48 overflow-y-auto">
-          {Array.from({ length: 5 }, (_, i) => i + 1).map(lvl => {
-            const feats = featuresByLevel.get(lvl)
-            if (!feats?.length) return null
-            return (
-              <div key={lvl} className="flex gap-2 text-xs">
-                <span
-                  className="w-6 h-5 flex items-center justify-center rounded text-dnd-darker font-bold text-xs flex-shrink-0"
-                  style={{ backgroundColor: color }}
-                >
-                  {lvl}
-                </span>
-                <span className="text-gray-300">{feats.join('、')}</span>
-              </div>
-            )
-          })}
-          <p className="text-xs text-gray-500 mt-1">（選擇職業並設定等級後，在步驟五查看完整特性）</p>
-        </div>
-      </div>
-
-      {/* 職業進度表（前兩行） */}
-      {summary.classTableGroups?.slice(0, 1).map((group, gi) => (
-        <ClassTablePreview key={gi} group={group} />
-      ))}
-    </div>
-  )
-}
-
-function ClassTablePreview({ group }: { group: ClassTableGroup }) {
-  return (
-    <div className="overflow-x-auto">
-      <table className="text-xs w-full">
-        <thead>
-          <tr>
-            <th className="text-left text-gray-500 pr-2">等級</th>
-            {group.colLabels.map((col, i) => (
-              <th key={i} className="text-left text-gray-500 pr-2">{col}</th>
-            ))}
-          </tr>
-        </thead>
-        <tbody>
-          {group.rows.slice(0, 5).map((row, ri) => (
-            <tr key={ri}>
-              <td className="text-gray-400 pr-2">{ri + 1}</td>
-              {row.map((cell, ci) => (
-                <td key={ci} className="text-gray-300 pr-2">
-                  {typeof cell === 'object' && cell && 'value' in cell
-                    ? `+${(cell as { value: number }).value}`
-                    : String(cell ?? '—')}
-                </td>
-              ))}
-            </tr>
+      {/* 職業概述 */}
+      {overview?.length ? (
+        <div className="space-y-1">
+          {overview.map((sentence, i) => (
+            <p key={i} className="text-xs text-gray-300 leading-relaxed">{sentence}</p>
           ))}
-        </tbody>
-      </table>
+        </div>
+      ) : (
+        <p className="text-xs text-gray-500">（暫無概述）</p>
+      )}
     </div>
   )
 }
