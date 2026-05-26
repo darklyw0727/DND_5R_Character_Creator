@@ -4,7 +4,7 @@ import { RACE_NAME_ZH } from '../data/zhTranslations'
 export interface ParsedRace {
   name: string
   source: string
-  size: string
+  sizes: string[]
   walkSpeed: number
   flySpeed?: number
   darkvision?: number
@@ -101,7 +101,7 @@ export function parseRaceFile(raw: RawRaceFile): ParsedRace[] {
     return {
       name: race.name,
       source: race.source,
-      size: race.size?.[0] ?? 'M',
+      sizes: race.size ?? ['M'],
       walkSpeed: getWalkSpeed(race),
       flySpeed: getFlySpeed(race),
       darkvision: race.darkvision,

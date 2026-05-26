@@ -82,7 +82,7 @@ function isThirdCaster(className: string, sub?: string): boolean {
 export default function Step7Naming() {
   const store = useCharacterStore()
   const {
-    characterName, setCharacterName, classes, raceName, raceVariant,
+    characterName, setCharacterName, classes, raceName, raceVariant, raceSize,
     backgroundName, spellSelections, asiChoices,
   } = store
 
@@ -130,7 +130,7 @@ export default function Step7Naming() {
   const currentRace = raceDataList.find(r => r.name === raceName)
   const walkSpeed   = currentRace?.walkSpeed ?? 30
   const flySpeed    = currentRace?.flySpeed
-  const size        = currentRace?.size ?? 'M'
+  const size        = raceSize ?? currentRace?.sizes?.[0] ?? 'M'
 
   // ── 背景與熟練 ────────────────────────────────────────────────────────────
   const bgData    = bgDataList.find(b => b.name === backgroundName)

@@ -7,7 +7,7 @@ import EntryRenderer from '../shared/EntryRenderer'
 import type { ParsedRace } from '../../services/raceParser'
 
 export default function Step2Race() {
-  const { raceName, raceVariant, setRace } = useCharacterStore()
+  const { raceName, raceVariant, raceSize, setRace, setRaceSize } = useCharacterStore()
   const { data: races, loading, error } = useRaceData()
   const [selected, setSelected] = useState<ParsedRace | null>(
     races.find(r => r.name === raceName) ?? null
@@ -18,7 +18,8 @@ export default function Step2Race() {
 
   function select(race: ParsedRace, variant?: string) {
     setSelected(race)
-    setRace(race.name, race.source, variant)
+    const size = race.sizes.length === 1 ? race.sizes[0] : undefined
+    setRace(race.name, race.source, variant, size)
   }
 
   return (
@@ -47,7 +48,7 @@ export default function Step2Race() {
                   <div className="flex-1">
                     <div className="font-bold text-gray-100">{RACE_NAME_ZH[race.name] ?? race.name}</div>
                     <div className="flex gap-2 mt-1 flex-wrap">
-                      <span className="tag">{SIZE_LABEL[race.size] ?? race.size}</span>
+                      <span className="tag">{race.sizes.map(s => SIZE_LABEL[s] ?? s).join('/')}</span>
                       <span className="tag">速度 {race.walkSpeed}呎</span>
                       {race.flySpeed && <span className="tag-gold">飛行 {race.flySpeed}呎</span>}
                       {race.darkvision && <span className="tag">暗視 {race.darkvision}呎</span>}
@@ -76,6 +77,28 @@ export default function Step2Race() {
                     ))}
                   </div>
                 )}
+
+                {/* 體型選擇（多體型時） */}
+                {isSel && race.sizes.length > 1 && (
+                  <div className="mt-3 space-y-2" onClick={e => e.stopPropagation()}>
+                    <p className="text-xs text-dnd-gold">選擇體型：</p>
+                    <div className="flex gap-2 flex-wrap">
+                      {race.sizes.map(s => (
+                        <button
+                          key={s}
+                          onClick={() => setRaceSize(s)}
+                          className={`px-3 py-1.5 rounded text-sm border transition-colors
+                            ${raceSize === s
+                              ? 'border-dnd-gold bg-dnd-gold/10 text-dnd-gold'
+                              : 'border-dnd-border hover:border-gray-500 text-gray-300'
+                            }`}
+                        >
+                          {SIZE_LABEL[s] ?? s}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                )}
               </div>
             )
           })}
@@ -89,7 +112,12 @@ export default function Step2Race() {
               {raceVariant && <p className="text-parchment-300 text-sm mb-2">亞種：{RACE_VARIANT_NAME_ZH[raceVariant] ?? raceVariant}</p>}
 
               <div className="grid grid-cols-3 gap-2 mb-4 text-xs">
-                <InfoItem label="體型" value={SIZE_LABEL[selected.size] ?? selected.size} />
+                <InfoItem
+                  label="體型"
+                  value={raceSize
+                    ? (SIZE_LABEL[raceSize] ?? raceSize)
+                    : selected.sizes.map(s => SIZE_LABEL[s] ?? s).join('/')}
+                />
                 <InfoItem label="移動速度" value={`${selected.walkSpeed} 呎`} />
                 {selected.darkvision && <InfoItem label="暗視" value={`${selected.darkvision} 呎`} />}
                 {selected.flySpeed && <InfoItem label="飛行速度" value={`${selected.flySpeed} 呎`} />}

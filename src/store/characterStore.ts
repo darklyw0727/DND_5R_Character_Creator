@@ -15,6 +15,7 @@ const initialState: CharacterState = {
   raceName: undefined,
   raceSource: undefined,
   raceVariant: undefined,
+  raceSize: undefined,
   backgroundName: undefined,
   backgroundSource: undefined,
   backgroundEquipmentSet: undefined,
@@ -38,7 +39,8 @@ interface CharacterActions {
   setSubclass: (index: number, shortName: string, source: string) => void
 
   // Step 2
-  setRace: (name: string, source: string, variant?: string) => void
+  setRace: (name: string, source: string, variant?: string, size?: string) => void
+  setRaceSize: (size: string) => void
 
   // Step 3
   setBackground: (name: string, source: string) => void
@@ -113,9 +115,11 @@ export const useCharacterStore = create<Store>()(
       })),
 
       // ── Step 2 ──────────────────────────────────────────
-      setRace: (name, source, variant) => set({
-        raceName: name, raceSource: source, raceVariant: variant,
+      setRace: (name, source, variant, size) => set({
+        raceName: name, raceSource: source, raceVariant: variant, raceSize: size,
       }),
+
+      setRaceSize: (size) => set({ raceSize: size }),
 
       // ── Step 3 ──────────────────────────────────────────
       setBackground: (name, source) => set({
