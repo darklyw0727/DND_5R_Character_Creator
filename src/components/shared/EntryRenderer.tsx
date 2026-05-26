@@ -49,16 +49,26 @@ function RenderEntry({ entry, mode, depth }: { entry: Entry; mode: string; depth
 
     case 'list': {
       const list = entry as EntryList
+      // list-hang-notitle：具名子項（type:"item"），不加項目符號，直接路由到 case 'item'
+      if (list.style?.includes('hang')) {
+        return (
+          <div className="mb-3 ml-2 space-y-2">
+            {list.items.map((item, i) =>
+              typeof item === 'string'
+                ? <p key={i} className="text-gray-300">{renderText(item)}</p>
+                : <RenderEntry key={i} entry={item as Entry} mode={mode} depth={depth} />
+            )}
+          </div>
+        )
+      }
+      // 一般列表：項目符號
       return (
         <ul className="list-disc list-inside mb-3 space-y-1 text-gray-300 ml-2">
           {list.items.map((item, i) => (
             <li key={i}>
               {typeof item === 'string'
                 ? renderText(item)
-                : 'name' in (item as object)
-                  ? <><strong className="text-gray-200">{(item as {name: string}).name}:</strong>{' '}
-                    {renderText((item as {entry?: string}).entry ?? '')}</>
-                  : <RenderEntry entry={item as Entry} mode={mode} depth={depth} />
+                : <RenderEntry entry={item as Entry} mode={mode} depth={depth} />
               }
             </li>
           ))}

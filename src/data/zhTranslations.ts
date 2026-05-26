@@ -1101,3 +1101,96 @@ export const CLASS_FEATURE_NAME_ZH: Record<string, string> = {
   'Darkvision':             '黑暗視覺',
   'Light':                  '光輝',
 }
+
+export const RACE_FEATURE_NAME_ZH: Record<string, string> = {
+  // 阿斯莫
+  'Celestial Resistance':          '天界抗性',
+  'Healing Hands':                 '治癒之手',
+  'Light Bearer':                  '光輝掌者',
+  'Celestial Revelation':          '天啟',
+  // 龍裔
+  'Draconic Ancestry':             '龍族血統',
+  'Breath Weapon':                 '吐息武器',
+  'Damage Resistance':             '傷害抗性',
+  'Draconic Flight':               '龍族飛翼',
+  // 矮人
+  'Dwarven Resilience':            '矮人體魄',
+  'Dwarven Toughness':             '矮人剛毅',
+  'Stonecunning':                  '石中精妙',
+  // 精靈
+  'Elven Lineage':                 '精靈血系',
+  'Elven Lineage (Drow)':          '精靈血系（卓爾）',
+  'Elven Lineage (High Elf)':      '精靈血系（高等精靈）',
+  'Elven Lineage (Wood Elf)':      '精靈血系（木精靈）',
+  'Fey Ancestry':                  '妖族血統',
+  'Keen Senses':                   '敏銳感官',
+  'Trance':                        '出神',
+  // 侏儒
+  'Gnomish Cunning':               '侏儒狡黠',
+  'Gnomish Lineage':               '侏儒血系',
+  'Gnomish Lineage (Forest Gnome)':'侏儒血系（森林侏儒）',
+  'Gnomish Lineage (Rock Gnome)':  '侏儒血系（岩石侏儒）',
+  // 歌利亞
+  'Giant Ancestry':                '巨人先祖',
+  'Giant Ancestry (Cloud)':        '巨人先祖（雲巨人）',
+  'Giant Ancestry (Fire)':         '巨人先祖（火巨人）',
+  'Giant Ancestry (Frost)':        '巨人先祖（冰霜巨人）',
+  'Giant Ancestry (Hill)':         '巨人先祖（丘陵巨人）',
+  'Giant Ancestry (Stone)':        '巨人先祖（石巨人）',
+  'Giant Ancestry (Storm)':        '巨人先祖（風暴巨人）',
+  'Large Form':                    '大型形態',
+  'Powerful Build':                '身強力壯',
+  // 半身人
+  'Brave':                         '勇氣',
+  'Halfling Nimbleness':           '半身人靈巧',
+  'Luck':                          '幸運',
+  'Lucky':                         '幸運',
+  'Naturally Stealthy':            '天生善匿',
+  // 人類
+  'Resourceful':                   '適應力',
+  'Skillful':                      '技能',
+  'Versatile':                     '多才多藝',
+  // 獸人
+  'Adrenaline Rush':               '激昂衝鋒',
+  'Relentless Endurance':          '堅韌不屈',
+  // 提夫林
+  'Fiendish Legacy':               '邪魔遺贈',
+  'Fiendish Legacy (Abyssal)':     '邪魔遺贈（深淵）',
+  'Fiendish Legacy (Chthonic)':    '邪魔遺贈（冥府）',
+  'Fiendish Legacy (Infernal)':    '邪魔遺贈（魔界）',
+  'Otherworldly Presence':         '異界存在',
+  // 共用
+  'Darkvision':                    '黑暗視覺',
+}
+
+export const RACE_VARIANT_NAME_ZH: Record<string, string> = {
+  // 龍裔
+  'Dragonborn (Black)':              '龍裔（黑龍）',
+  'Dragonborn (Blue)':               '龍裔（藍龍）',
+  'Dragonborn (Brass)':              '龍裔（黃銅龍）',
+  'Dragonborn (Bronze)':             '龍裔（青銅龍）',
+  'Dragonborn (Copper)':             '龍裔（銅龍）',
+  'Dragonborn (Gold)':               '龍裔（金龍）',
+  'Dragonborn (Green)':              '龍裔（綠龍）',
+  'Dragonborn (Red)':                '龍裔（紅龍）',
+  'Dragonborn (Silver)':             '龍裔（銀龍）',
+  'Dragonborn (White)':              '龍裔（白龍）',
+  // 精靈
+  'Elf; Drow Lineage':               '精靈（卓爾血系）',
+  'Elf; High Elf Lineage':           '精靈（高等精靈血系）',
+  'Elf; Wood Elf Lineage':           '精靈（木精靈血系）',
+  // 侏儒
+  'Gnome; Forest Gnome Lineage':     '侏儒（森林侏儒血系）',
+  'Gnome; Rock Gnome Lineage':       '侏儒（岩石侏儒血系）',
+  // 歌利亞
+  'Goliath; Cloud Giant Ancestry':   '歌利亞（雲巨人血統）',
+  'Goliath; Fire Giant Ancestry':    '歌利亞（火巨人血統）',
+  'Goliath; Frost Giant Ancestry':   '歌利亞（冰霜巨人血統）',
+  'Goliath; Hill Giant Ancestry':    '歌利亞（丘陵巨人血統）',
+  'Goliath; Stone Giant Ancestry':   '歌利亞（石巨人血統）',
+  'Goliath; Storm Giant Ancestry':   '歌利亞（風暴巨人血統）',
+  // 提夫林
+  'Tiefling; Abyssal Legacy':        '提夫林（深淵遺贈）',
+  'Tiefling; Chthonic Legacy':       '提夫林（冥府遺贈）',
+  'Tiefling; Infernal Legacy':       '提夫林（魔界遺贈）',
+}
