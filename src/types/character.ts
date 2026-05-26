@@ -60,6 +60,7 @@ export interface CharacterState {
   raceSource?: string
   raceVariant?: string
   raceSize?: string
+  raceSkillChoices?: string[]
 
   // Step 3
   backgroundName?: string

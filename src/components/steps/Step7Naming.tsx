@@ -83,6 +83,7 @@ export default function Step7Naming() {
   const store = useCharacterStore()
   const {
     characterName, setCharacterName, classes, raceName, raceVariant, raceSize,
+    raceSkillChoices,
     backgroundName, spellSelections, asiChoices,
   } = store
 
@@ -104,8 +105,14 @@ export default function Step7Naming() {
   const dexMod = getModifier(finalScores.dex)
   const wisMod = getModifier(finalScores.wis)
 
+  // ── 種族 ──────────────────────────────────────────────────────────────────
+  const currentRace = raceDataList.find(r => r.name === raceName)
+  const walkSpeed   = currentRace?.walkSpeed ?? 30
+  const flySpeed    = currentRace?.flySpeed
+  const size        = raceSize ?? currentRace?.sizes?.[0] ?? 'M'
+
   // ── HP ────────────────────────────────────────────────────────────────────
-  // HP = Σ(每職業: 等級*(hd/2+1+conMod)) + (主職業hd/2 - 1)
+  // HP = Σ(每職業: 等級*(hd/2+1+conMod)) + (主職業hd/2 - 1) + 種族HP加成
   let hp: number | null = null
   if (classes.length > 0 && classDataMap.size > 0) {
     const primaryHD = classDataMap.get(classes[0].className)?.summary.hd ?? 8
@@ -114,6 +121,7 @@ export default function Step7Naming() {
       const hd = classDataMap.get(cls.className)?.summary.hd ?? 8
       total += cls.level * (Math.floor(hd / 2) + 1 + conMod)
     }
+    total += (currentRace?.hpBonusPerLevel ?? 0) * totalLevel
     hp = total
   }
 
@@ -126,12 +134,6 @@ export default function Step7Naming() {
     className: cls.className,
   }))
 
-  // ── 種族 ──────────────────────────────────────────────────────────────────
-  const currentRace = raceDataList.find(r => r.name === raceName)
-  const walkSpeed   = currentRace?.walkSpeed ?? 30
-  const flySpeed    = currentRace?.flySpeed
-  const size        = raceSize ?? currentRace?.sizes?.[0] ?? 'M'
-
   // ── 背景與熟練 ────────────────────────────────────────────────────────────
   const bgData    = bgDataList.find(b => b.name === backgroundName)
   const bgSkills: string[] = bgData?.skillProficiencies ?? []
@@ -141,7 +143,10 @@ export default function Step7Naming() {
     ? (classDataMap.get(classes[0].className)?.summary.rawClass.proficiency ?? [])
     : []
 
-  const hasPerceptionProf = bgSkills.some(s => s === '察覺')
+  const raceFixedSkills = currentRace?.skillProficiencies ?? []
+  const allProficientSkills = [...bgSkills, ...raceFixedSkills, ...(raceSkillChoices ?? [])]
+
+  const hasPerceptionProf = allProficientSkills.some(s => s === '察覺')
   const passivePerception  = 10 + wisMod + (hasPerceptionProf ? profBonus : 0)
 
   const primarySkillEntry = classes.length > 0
@@ -395,7 +400,7 @@ export default function Step7Naming() {
                       </div>
                       {/* 技能 */}
                       {skills.map(skill => {
-                        const proficient = bgSkills.some(s => s === skill.zh)
+                        const proficient = allProficientSkills.some(s => s === skill.zh)
                         const skillMod   = mod + (proficient ? profBonus : 0)
                         return (
                           <div key={skill.en} className="flex items-center gap-1.5 text-xs">

@@ -7,7 +7,7 @@ import EntryRenderer from '../shared/EntryRenderer'
 import type { ParsedRace } from '../../services/raceParser'
 
 export default function Step2Race() {
-  const { raceName, raceVariant, raceSize, setRace, setRaceSize } = useCharacterStore()
+  const { raceName, raceVariant, raceSize, raceSkillChoices, setRace, setRaceSize, setRaceSkillChoices } = useCharacterStore()
   const { data: races, loading, error } = useRaceData()
   const [selected, setSelected] = useState<ParsedRace | null>(
     races.find(r => r.name === raceName) ?? null
@@ -96,6 +96,43 @@ export default function Step2Race() {
                           {SIZE_LABEL[s] ?? s}
                         </button>
                       ))}
+                    </div>
+                  </div>
+                )}
+
+                {/* 技能熟練選擇（種族特質如敏銳感官） */}
+                {isSel && race.skillChoices && (
+                  <div className="mt-3 space-y-2" onClick={e => e.stopPropagation()}>
+                    <p className="text-xs text-dnd-gold">
+                      選擇技能熟練（選 {race.skillChoices.count} 項）：
+                    </p>
+                    <div className="flex gap-2 flex-wrap">
+                      {race.skillChoices.from.map(skill => {
+                        const chosen = raceSkillChoices ?? []
+                        const isChosen = chosen.includes(skill)
+                        const maxReached = chosen.length >= race.skillChoices!.count
+                        return (
+                          <button
+                            key={skill}
+                            onClick={() => {
+                              if (isChosen) {
+                                setRaceSkillChoices(chosen.filter(s => s !== skill))
+                              } else if (!maxReached) {
+                                setRaceSkillChoices([...chosen, skill])
+                              }
+                            }}
+                            className={`px-3 py-1.5 rounded text-sm border transition-colors
+                              ${isChosen
+                                ? 'border-dnd-gold bg-dnd-gold/10 text-dnd-gold'
+                                : maxReached
+                                  ? 'border-dnd-border text-gray-600 cursor-not-allowed'
+                                  : 'border-dnd-border hover:border-gray-500 text-gray-300'
+                              }`}
+                          >
+                            {skill}
+                          </button>
+                        )
+                      })}
                     </div>
                   </div>
                 )}

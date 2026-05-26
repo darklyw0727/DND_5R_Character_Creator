@@ -11,6 +11,9 @@ export interface ParsedRace {
   creatureTypes: string[]
   entries: Entry[]
   variants?: RaceVariant[]  // 若有 _versions，展開為亞種選項
+  hpBonusPerLevel: number           // 如矮人剛毅 +1 HP/level
+  skillProficiencies: string[]      // 固定技能熟練（繁中名）
+  skillChoices?: { from: string[]; count: number }  // 可選技能（如精靈敏銳感官）
   rawRace: RawRace
 }
 
@@ -92,11 +95,61 @@ function expandVersions(race: RawRace): RaceVariant[] | undefined {
   return variants.length ? variants : undefined
 }
 
+const SKILL_LABEL: Record<string, string> = {
+  acrobatics: '體操', animalHandling: '馴獸',
+  arcana: '奧秘', athletics: '運動', deception: '欺瞞',
+  history: '歷史', insight: '洞悉', intimidation: '威嚇',
+  investigation: '調查', medicine: '醫療', nature: '自然',
+  perception: '察覺', performance: '表演', persuasion: '遊說',
+  religion: '宗教', sleightOfHand: '巧手', stealth: '隱匿',
+  survival: '求生',
+}
+
+const ALL_SKILLS_ZH = [
+  '運動', '體操', '巧手', '隱匿', '奧秘', '歷史', '調查', '自然', '宗教',
+  '馴獸', '洞悉', '醫療', '察覺', '求生', '欺瞞', '威嚇', '表演', '遊說',
+]
+
+function parseRaceSkills(race: RawRace): {
+  fixed: string[]
+  choices?: { from: string[]; count: number }
+} {
+  if (!race.skillProficiencies) return { fixed: [] }
+  const fixed: string[] = []
+  let choices: { from: string[]; count: number } | undefined
+
+  for (const obj of race.skillProficiencies) {
+    for (const [key, val] of Object.entries(obj)) {
+      if (val === true) {
+        fixed.push(SKILL_LABEL[key] ?? key)
+      } else if (key === 'choose' && typeof val === 'object' && val !== null) {
+        const v = val as { from?: string[] }
+        if (v.from) choices = { from: v.from.map(s => SKILL_LABEL[s] ?? s), count: 1 }
+      } else if (key === 'any' && typeof val === 'number') {
+        choices = { from: ALL_SKILLS_ZH, count: val }
+      }
+    }
+  }
+  return { fixed, choices }
+}
+
+function detectHpBonusPerLevel(race: RawRace): number {
+  for (const entry of (race.entries ?? [])) {
+    if (typeof entry !== 'object' || !('entries' in entry)) continue
+    const text = typeof (entry as { entries?: unknown[] }).entries?.[0] === 'string'
+      ? ((entry as { entries: string[] }).entries[0])
+      : ''
+    if (text.includes('Hit Point') && text.includes('increases by 1') && text.includes('level')) return 1
+  }
+  return 0
+}
+
 export function parseRaceFile(raw: RawRaceFile): ParsedRace[] {
   const xphbRaces = raw.race.filter(r => r.source === 'XPHB' && !r._copy)
 
   return xphbRaces.map(race => {
     const variants = expandVersions(race)
+    const { fixed: skillProficiencies, choices: skillChoices } = parseRaceSkills(race)
 
     return {
       name: race.name,
@@ -108,6 +161,9 @@ export function parseRaceFile(raw: RawRaceFile): ParsedRace[] {
       creatureTypes: race.creatureTypes ?? ['humanoid'],
       entries: race.entries,
       variants: variants?.length ? variants : undefined,
+      hpBonusPerLevel: detectHpBonusPerLevel(race),
+      skillProficiencies,
+      skillChoices,
       rawRace: race,
     }
   })
