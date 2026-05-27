@@ -83,7 +83,7 @@ export default function Step7Naming() {
   const store = useCharacterStore()
   const {
     characterName, setCharacterName, classes, raceName, raceVariant, raceSize,
-    raceSkillChoices,
+    raceSkillChoices, raceFeat,
     backgroundName, spellSelections, asiChoices,
   } = store
 
@@ -155,7 +155,7 @@ export default function Step7Naming() {
 
   // ── 專長 ──────────────────────────────────────────────────────────────────
   const asiFeats  = asiChoices.filter(a => a.choice === 'feat' && a.featName).map(a => a.featName!)
-  const allFeats  = [...bgFeats, ...asiFeats]
+  const allFeats  = [...bgFeats, ...(raceFeat ? [raceFeat] : []), ...asiFeats]
 
   // ── 種族法術 ───────────────────────────────────────────────────────────────
   const raceBaseSpells   = currentRace?.spells ?? []

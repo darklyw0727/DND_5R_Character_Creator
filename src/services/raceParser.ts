@@ -29,6 +29,7 @@ export interface ParsedRace {
   skillProficiencies: string[]      // 固定技能熟練（繁中名）
   skillChoices?: { from: string[]; count: number }  // 可選技能（如精靈敏銳感官）
   spells: RaceSpell[]               // 種族法術（不含亞種，如阿斯莫 光亮術）
+  featChoice?: { categories: string[]; count: number }  // 如人類：選1個起源專長
   rawRace: RawRace
 }
 
@@ -210,6 +211,16 @@ function parseAdditionalSpells(additionalSpells: unknown[], skipNamed = false): 
   return result
 }
 
+function parseRaceFeatChoice(race: RawRace): { categories: string[]; count: number } | undefined {
+  if (!race.feats?.length) return undefined
+  for (const obj of race.feats) {
+    if (obj.anyFromCategory) {
+      return { categories: obj.anyFromCategory.category, count: obj.anyFromCategory.count }
+    }
+  }
+  return undefined
+}
+
 function detectHpBonusPerLevel(race: RawRace): number {
   for (const entry of (race.entries ?? [])) {
     if (typeof entry !== 'object' || !('entries' in entry)) continue
@@ -242,6 +253,7 @@ export function parseRaceFile(raw: RawRaceFile): ParsedRace[] {
       skillProficiencies,
       skillChoices,
       spells: parseAdditionalSpells(race.additionalSpells as unknown[] ?? [], true),
+      featChoice: parseRaceFeatChoice(race),
       rawRace: race,
     }
   })

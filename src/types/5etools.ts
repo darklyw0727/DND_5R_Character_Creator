@@ -271,6 +271,7 @@ export interface RawRace {
   immune?: string[]
   traitTags?: string[]
   additionalSpells?: unknown[]
+  feats?: Array<{ anyFromCategory?: { category: string[]; count: number } }>
   entries: Entry[]
   hasFluff?: boolean
   hasFluffImages?: boolean

@@ -1,17 +1,32 @@
-import { useState } from 'react'
+import { useState, useMemo, useCallback } from 'react'
 import { useCharacterStore } from '../../store/characterStore'
 import { useRaceData } from '../../hooks/useRaceData'
+import { useFeatData } from '../../hooks/useFeatData'
 import { SIZE_LABEL } from '../../services/raceParser'
-import { RACE_NAME_ZH, RACE_VARIANT_NAME_ZH } from '../../data/zhTranslations'
+import { RACE_NAME_ZH, RACE_VARIANT_NAME_ZH, FEAT_NAME_ZH } from '../../data/zhTranslations'
 import EntryRenderer from '../shared/EntryRenderer'
 import type { ParsedRace } from '../../services/raceParser'
+import type { RawFeat } from '../../types/5etools'
 
 export default function Step2Race() {
-  const { raceName, raceVariant, raceSize, raceSkillChoices, setRace, setRaceSize, setRaceSkillChoices } = useCharacterStore()
+  const { raceName, raceVariant, raceSize, raceSkillChoices, raceFeat, setRace, setRaceSize, setRaceSkillChoices, setRaceFeat } = useCharacterStore()
   const { data: races, loading, error } = useRaceData()
+  const { data: featMap } = useFeatData()
   const [selected, setSelected] = useState<ParsedRace | null>(
     races.find(r => r.name === raceName) ?? null
   )
+  const [hoveredFeat, setHoveredFeat] = useState<string | null>(null)
+  const clearHover = useCallback(() => setHoveredFeat(null), [])
+
+  // 依種族 featChoice.categories 篩選可選專長（名稱列表）
+  const availableFeats = useMemo(() => {
+    const cats = selected?.featChoice?.categories
+    if (!cats?.length) return []
+    return [...featMap.values()]
+      .filter(f => f.category && cats.includes(f.category))
+      .map(f => f.name)
+      .sort()
+  }, [selected, featMap])
 
   if (loading) return <Loading />
   if (error) return <ErrorState message={error} />
@@ -136,6 +151,41 @@ export default function Step2Race() {
                     </div>
                   </div>
                 )}
+
+                {/* 專長選擇（種族提供起源專長，如人類） */}
+                {isSel && race.featChoice && availableFeats.length > 0 && (
+                  <div className="mt-3 space-y-2" onClick={e => e.stopPropagation()}>
+                    <p className="text-xs text-dnd-gold">
+                      選擇起源專長（選 {race.featChoice.count} 項）：
+                    </p>
+                    <div className="flex gap-2 flex-wrap">
+                      {availableFeats.map(feat => (
+                        <button
+                          key={feat}
+                          onMouseEnter={() => setHoveredFeat(feat)}
+                          onMouseLeave={clearHover}
+                          onClick={() => setRaceFeat(raceFeat === feat ? undefined : feat)}
+                          className={`px-3 py-1.5 rounded text-sm border transition-colors
+                            ${raceFeat === feat
+                              ? 'border-dnd-gold bg-dnd-gold/10 text-dnd-gold'
+                              : 'border-dnd-border hover:border-gray-500 text-gray-300'
+                            }`}
+                        >
+                          {FEAT_NAME_ZH[feat] ?? feat}
+                        </button>
+                      ))}
+                    </div>
+
+                    {/* 專長效果預覽 */}
+                    {(hoveredFeat || raceFeat) && (
+                      <FeatPreview
+                        featName={hoveredFeat ?? raceFeat!}
+                        featMap={featMap}
+                        isSelected={!hoveredFeat && !!raceFeat}
+                      />
+                    )}
+                  </div>
+                )}
               </div>
             )
           })}
@@ -179,6 +229,33 @@ export default function Step2Race() {
           )}
         </div>
       </div>
+    </div>
+  )
+}
+
+// ── 專長效果預覽 ──────────────────────────────────────────────────────────────
+interface FeatPreviewProps {
+  featName: string
+  featMap: Map<string, RawFeat>
+  isSelected: boolean
+}
+
+function FeatPreview({ featName, featMap, isSelected }: FeatPreviewProps) {
+  const feat = featMap.get(featName.toLowerCase())
+  if (!feat?.entries?.length) return null
+  return (
+    <div
+      className={`mt-1 p-3 rounded border transition-colors ${
+        isSelected
+          ? 'border-dnd-gold/50 bg-dnd-gold/5'
+          : 'border-dnd-border bg-dnd-dark/70'
+      }`}
+    >
+      <p className={`text-xs font-semibold mb-1.5 ${isSelected ? 'text-dnd-gold' : 'text-gray-300'}`}>
+        {FEAT_NAME_ZH[featName] ?? featName}
+        {isSelected && <span className="ml-1.5 opacity-60">（已選擇）</span>}
+      </p>
+      <EntryRenderer entries={feat.entries} className="text-xs text-gray-400 space-y-1 [&_p]:mb-1 [&_p]:leading-relaxed" />
     </div>
   )
 }

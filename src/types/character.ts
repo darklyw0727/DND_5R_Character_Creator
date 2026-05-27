@@ -61,6 +61,7 @@ export interface CharacterState {
   raceVariant?: string
   raceSize?: string
   raceSkillChoices?: string[]
+  raceFeat?: string
 
   // Step 3
   backgroundName?: string
