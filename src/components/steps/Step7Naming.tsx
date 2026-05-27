@@ -157,6 +157,14 @@ export default function Step7Naming() {
   const asiFeats  = asiChoices.filter(a => a.choice === 'feat' && a.featName).map(a => a.featName!)
   const allFeats  = [...bgFeats, ...asiFeats]
 
+  // ── 種族法術 ───────────────────────────────────────────────────────────────
+  const raceBaseSpells   = currentRace?.spells ?? []
+  const raceVariantSpells = raceVariant
+    ? (currentRace?.variants?.find(v => v.name === raceVariant)?.spells ?? [])
+    : []
+  const allRaceSpells = [...raceBaseSpells, ...raceVariantSpells]
+    .sort((a, b) => a.levelRequired - b.levelRequired)
+
   // ── 職業特性（含子職業特性，帶查找鍵） ────────────────────────────────────
   const classFeaturesList = classes.map(cls => {
     const data = classDataMap.get(cls.className)
@@ -505,6 +513,39 @@ export default function Step7Naming() {
                         <div className="ml-4 pb-2 pl-2 border-l border-dnd-border/40">
                           <EntryBlock entries={entries} />
                         </div>
+                      )}
+                    </div>
+                  )
+                })}
+              </div>
+            </div>
+          )}
+
+          {/* 種族法術 */}
+          {allRaceSpells.length > 0 && (
+            <div className="card">
+              <h3 className="section-title">種族法術</h3>
+              <div className="space-y-1.5">
+                {allRaceSpells.map((spell, i) => {
+                  const available = totalLevel >= spell.levelRequired
+                  return (
+                    <div
+                      key={i}
+                      className={`flex items-center gap-2 text-sm transition-opacity ${available ? 'opacity-100' : 'opacity-35'}`}
+                    >
+                      <span className="text-dnd-gold/60 flex-shrink-0">◈</span>
+                      <span className={available ? 'text-gray-200' : 'text-gray-500'}>
+                        {spell.zhName}
+                      </span>
+                      <span className="ml-auto flex-shrink-0 text-xs text-gray-500">
+                        {spell.usage === 'cantrip'   ? '隨意' :
+                         spell.usage === 'daily'     ? '1/日' :
+                         spell.usage === 'pb-daily'  ? 'PB次/日' : '自選'}
+                      </span>
+                      {spell.levelRequired > 1 && (
+                        <span className={`text-[10px] flex-shrink-0 ${available ? 'text-gray-600' : 'text-gray-700'}`}>
+                          等級{spell.levelRequired}+
+                        </span>
                       )}
                     </div>
                   )

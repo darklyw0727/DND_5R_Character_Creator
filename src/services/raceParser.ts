@@ -1,5 +1,19 @@
 import type { RawRaceFile, RawRace, RaceVersion, Entry, RaceVersionMod } from '../types/5etools'
-import { RACE_NAME_ZH } from '../data/zhTranslations'
+import { RACE_NAME_ZH, SPELL_NAME_ZH } from '../data/zhTranslations'
+
+// 大小寫不敏感的法術名稱查表
+const SPELL_ZH_LOWER: Record<string, string> = Object.fromEntries(
+  Object.entries(SPELL_NAME_ZH).map(([k, v]) => [k.toLowerCase(), v])
+)
+
+export type RaceSpellUsage = 'cantrip' | 'daily' | 'pb-daily' | 'choose'
+
+export interface RaceSpell {
+  name: string             // 原始英文法術名（如 "dancing lights"）
+  zhName: string           // 繁體中文名稱
+  levelRequired: number    // 需要的角色等級
+  usage: RaceSpellUsage    // 使用方式
+}
 
 export interface ParsedRace {
   name: string
@@ -14,6 +28,7 @@ export interface ParsedRace {
   hpBonusPerLevel: number           // 如矮人剛毅 +1 HP/level
   skillProficiencies: string[]      // 固定技能熟練（繁中名）
   skillChoices?: { from: string[]; count: number }  // 可選技能（如精靈敏銳感官）
+  spells: RaceSpell[]               // 種族法術（不含亞種，如阿斯莫 光亮術）
   rawRace: RawRace
 }
 
@@ -22,6 +37,7 @@ export interface RaceVariant {
   entries: Entry[]
   darkvision?: number
   additionalSpells?: unknown[]
+  spells: RaceSpell[]
 }
 
 function getWalkSpeed(raw: RawRace): number {
@@ -83,13 +99,13 @@ function expandVersions(race: RawRace): RaceVariant[] | undefined {
         const entries = v._abstract._mod
           ? applyMod(race.entries, v._abstract._mod, vars)
           : [...race.entries]
-        variants.push({ name, entries, darkvision: impl.darkvision, additionalSpells: impl.additionalSpells })
+        variants.push({ name, entries, darkvision: impl.darkvision, additionalSpells: impl.additionalSpells, spells: parseAdditionalSpells(impl.additionalSpells ?? []) })
       }
     } else if (v.name) {
       const entries = v.entries
         ? (Array.isArray(v.entries) ? v.entries : [v.entries])
         : applyVersionMod(race.entries, v)
-      variants.push({ name: v.name, entries, darkvision: v.darkvision, additionalSpells: v.additionalSpells })
+      variants.push({ name: v.name, entries, darkvision: v.darkvision, additionalSpells: v.additionalSpells, spells: parseAdditionalSpells(v.additionalSpells ?? []) })
     }
   }
   return variants.length ? variants : undefined
@@ -133,6 +149,67 @@ function parseRaceSkills(race: RawRace): {
   return { fixed, choices }
 }
 
+/**
+ * 解析 additionalSpells 陣列為 RaceSpell[]。
+ * skipNamed=true：跳過有 name 欄位的條目（種族層級、亞種條目各自過濾）。
+ */
+function parseAdditionalSpells(additionalSpells: unknown[], skipNamed = false): RaceSpell[] {
+  if (!additionalSpells?.length) return []
+  const result: RaceSpell[] = []
+
+  for (const rawEntry of additionalSpells) {
+    const entry = rawEntry as Record<string, unknown>
+    if (skipNamed && entry.name) continue
+
+    // known：戲法 / 常備法術
+    const known = entry.known as Record<string, unknown> | undefined
+    if (known) {
+      for (const [lvlStr, spells] of Object.entries(known)) {
+        const levelRequired = parseInt(lvlStr) || 1
+        if (Array.isArray(spells)) {
+          for (const sp of spells) {
+            if (typeof sp === 'string') {
+              const rawName = sp.split('|')[0]
+              result.push({
+                name: rawName,
+                zhName: SPELL_ZH_LOWER[rawName.toLowerCase()] ?? rawName,
+                levelRequired,
+                usage: 'cantrip',
+              })
+            }
+          }
+        } else if (spells && typeof spells === 'object') {
+          // { "_": [{ "choose": "level=0|class=Wizard" }] }
+          result.push({ name: 'choose', zhName: '（自選法師戲法）', levelRequired, usage: 'choose' })
+        }
+      }
+    }
+
+    // innate：每日次數法術
+    const innate = entry.innate as Record<string, unknown> | undefined
+    if (innate) {
+      for (const [lvlStr, usageObj] of Object.entries(innate)) {
+        const levelRequired = parseInt(lvlStr) || 1
+        const daily = (usageObj as { daily?: Record<string, string[]> }).daily
+        if (daily) {
+          for (const [times, spells] of Object.entries(daily)) {
+            for (const sp of spells) {
+              const rawName = sp.split('|')[0]
+              result.push({
+                name: rawName,
+                zhName: SPELL_ZH_LOWER[rawName.toLowerCase()] ?? rawName,
+                levelRequired,
+                usage: times === 'pb' ? 'pb-daily' : 'daily',
+              })
+            }
+          }
+        }
+      }
+    }
+  }
+  return result
+}
+
 function detectHpBonusPerLevel(race: RawRace): number {
   for (const entry of (race.entries ?? [])) {
     if (typeof entry !== 'object' || !('entries' in entry)) continue
@@ -164,6 +241,7 @@ export function parseRaceFile(raw: RawRaceFile): ParsedRace[] {
       hpBonusPerLevel: detectHpBonusPerLevel(race),
       skillProficiencies,
       skillChoices,
+      spells: parseAdditionalSpells(race.additionalSpells as unknown[] ?? [], true),
       rawRace: race,
     }
   })
